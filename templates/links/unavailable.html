@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Link unavailable · LinkPulse{% endblock %}
+{% block content %}
+<section class="auth-card card center">
+  <p class="status-code">410</p>
+  <h1>This link is no longer available</h1>
+  <p class="muted">The owner has paused it or it has reached its end date.</p>
+  <a class="btn btn-quiet" href="{% url 'home' %}">Go to LinkPulse</a>
+</section>
+{% endblock %}

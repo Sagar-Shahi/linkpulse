@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Links · LinkPulse{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Links</h1>
+    <p class="muted">{{ total_links }} link{{ total_links|pluralize }} in total.</p>
+  </div>
+  <div class="head-actions">
+    <a class="btn btn-quiet" href="{% url 'links:export' %}">Export CSV</a>
+    <a class="btn btn-primary" href="{% url 'links:create' %}">New link</a>
+  </div>
+</div>
+
+<form class="filters" method="get" role="search">
+  <label class="visually-hidden" for="q">Search links</label>
+  <input id="q" type="search" name="q" value="{{ q }}" placeholder="Search by name, code, address or campaign" maxlength="100">
+  <label class="visually-hidden" for="status">Status</label>
+  <select id="status" name="status">
+    <option value="">All statuses</option>
+    <option value="live" {% if status == 'live' %}selected{% endif %}>Live</option>
+    <option value="paused" {% if status == 'paused' %}selected{% endif %}>Paused</option>
+    <option value="expired" {% if status == 'expired' %}selected{% endif %}>Expired</option>
+  </select>
+  <button class="btn btn-quiet" type="submit">Filter</button>
+</form>
+
+{% if page.object_list %}
+<section class="card flush">
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr><th scope="col">Link</th><th scope="col">Campaign</th><th scope="col">Status</th><th scope="col" class="num">Clicks</th><th scope="col">Created</th></tr>
+      </thead>
+      <tbody>
+        {% for link in page.object_list %}
+        <tr>
+          <td>
+            <a class="cell-title" href="{% url 'links:detail' link.pk %}">{{ link.title|default:link.code }}</a>
+            <span class="cell-sub muted">/r/{{ link.code }} &rarr; {{ link.destination_url|truncatechars:48 }}</span>
+          </td>
+          <td>{% if link.utm_campaign %}{{ link.utm_campaign }}{% else %}<span class="muted">None</span>{% endif %}</td>
+          <td><span class="badge badge-{{ link.status }}">{{ link.status|capfirst }}</span></td>
+          <td class="num">{{ link.total_clicks }}</td>
+          <td class="nowrap">{{ link.created_at|date:"M j, Y" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% if page.has_other_pages %}
+<nav class="pagination" aria-label="Pages">
+  {% if page.has_previous %}<a class="btn btn-quiet btn-small" href="?page={{ page.previous_page_number }}&q={{ q|urlencode }}&status={{ status|urlencode }}">Previous</a>{% endif %}
+  <span class="muted">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a class="btn btn-quiet btn-small" href="?page={{ page.next_page_number }}&q={{ q|urlencode }}&status={{ status|urlencode }}">Next</a>{% endif %}
+</nav>
+{% endif %}
+{% else %}
+<section class="card empty-state">
+  {% if q or status %}
+  <h2 class="card-title">No links match</h2>
+  <p class="muted">Try a different search or clear the status filter.</p>
+  <a class="btn btn-quiet" href="{% url 'links:list' %}">Clear filters</a>
+  {% else %}
+  <h2 class="card-title">No links yet</h2>
+  <p class="muted">Your first link takes about a minute to set up.</p>
+  <a class="btn btn-primary" href="{% url 'links:create' %}">Create a link</a>
+  {% endif %}
+</section>
+{% endif %}
+{% endblock %}

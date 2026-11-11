@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}{{ link.title|default:link.code }} · LinkPulse{% endblock %}
+{% block content %}
+<nav class="crumbs" aria-label="Breadcrumb"><a href="{% url 'links:list' %}">Links</a> <span aria-hidden="true">/</span> <span>{{ link.title|default:link.code }}</span></nav>
+
+<div class="page-head">
+  <div>
+    <h1>{{ link.title|default:link.code }} <span class="badge badge-{{ link.status }}">{{ link.status|capfirst }}</span></h1>
+    <p class="muted">Created {{ link.created_at|date:"M j, Y" }}{% if link.expires_at %} · Stops working {{ link.expires_at|date:"M j, Y H:i" }}{% endif %}</p>
+  </div>
+  <div class="head-actions">
+    <a class="btn btn-quiet" href="{% url 'links:edit' link.pk %}">Edit</a>
+    <form method="post" action="{% url 'links:toggle' link.pk %}">{% csrf_token %}<button class="btn btn-quiet" type="submit">{% if link.is_active %}Pause{% else %}Resume{% endif %}</button></form>
+    <a class="btn btn-danger-quiet" href="{% url 'links:delete' link.pk %}">Delete</a>
+  </div>
+</div>
+
+<section class="card link-card">
+  <div class="link-row">
+    <p class="link-label">Short link</p>
+    <div class="copy-row">
+      <code class="copy-value">{{ short_url }}</code>
+      <button type="button" class="btn btn-primary btn-small" data-copy="{{ short_url }}">Copy</button>
+    </div>
+  </div>
+  <div class="link-row">
+    <p class="link-label">Visitors land on</p>
+    <div class="copy-row">
+      <code class="copy-value">{{ link.target_url }}</code>
+      <button type="button" class="btn btn-quiet btn-small" data-copy="{{ link.target_url }}">Copy</button>
+    </div>
+  </div>
+</section>
+
+<div class="page-head compact">
+  <h2>Performance</h2>
+  {% include 'partials/period.html' %}
+</div>
+
+{% include 'partials/stats.html' %}
+
+<section class="card">
+  <h2 class="card-title">Clicks per day</h2>
+  {% include 'partials/chart.html' %}
+</section>
+
+<div class="grid-2">
+  {% include 'partials/breakdown.html' with title='Where visitors came from' rows=referrers empty='No clicks in this period yet.' %}
+  {% include 'partials/breakdown.html' with title='Devices' rows=devices empty='No clicks in this period yet.' %}
+</div>
+
+<section class="card">
+  <h2 class="card-title">Latest clicks</h2>
+  {% if recent_clicks %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th scope="col">When</th><th scope="col">From</th><th scope="col">Device</th></tr></thead>
+      <tbody>
+        {% for click in recent_clicks %}
+        <tr><td class="nowrap">{{ click.clicked_at|date:"M j, H:i" }}</td><td>{{ click.referrer_host|default:"Direct or unknown" }}</td><td>{{ click.get_device_display }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">Nobody has clicked this link yet. Copy the short link above and share it.</p>
+  {% endif %}
+</section>
+{% endblock %}

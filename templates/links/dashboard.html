@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard · LinkPulse{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="muted">Clicks from real people across all your links.</p>
+  </div>
+  {% include 'partials/period.html' %}
+</div>
+
+{% if link_count == 0 %}
+<section class="card empty-state">
+  <h2 class="card-title">Create your first tracked link</h2>
+  <p class="muted">Paste a page address, add the source, medium and campaign, and share the short link. Clicks show up here.</p>
+  <a class="btn btn-primary" href="{% url 'links:create' %}">Create a link</a>
+</section>
+{% else %}
+{% include 'partials/stats.html' %}
+
+<section class="card">
+  <h2 class="card-title">Clicks per day</h2>
+  {% include 'partials/chart.html' %}
+</section>
+
+<div class="grid-3">
+  {% include 'partials/breakdown.html' with title='Where visitors came from' rows=referrers empty='No clicks in this period yet.' %}
+  {% include 'partials/breakdown.html' with title='Devices' rows=devices empty='No clicks in this period yet.' %}
+  {% include 'partials/breakdown.html' with title='Campaigns' rows=campaigns empty='Add a campaign name to your links to compare them here.' %}
+</div>
+
+<section class="card">
+  <div class="card-head">
+    <h2 class="card-title">Top links, last {{ days }} days</h2>
+    <a href="{% url 'links:list' %}">All links</a>
+  </div>
+  {% if top_links %}
+  <ol class="rank-list">
+    {% for link in top_links %}
+    <li>
+      <a class="rank-main" href="{% url 'links:detail' link.pk %}">
+        <span class="rank-title">{{ link.title|default:link.code }}</span>
+        <span class="rank-sub muted">/r/{{ link.code }}</span>
+      </a>
+      <span class="rank-n">{{ link.period_clicks }} click{{ link.period_clicks|pluralize }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p class="muted">No clicks in this period yet. Share one of your links to get started.</p>
+  {% endif %}
+</section>
+{% endif %}
+{% endblock %}

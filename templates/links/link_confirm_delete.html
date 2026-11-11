@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Delete link · LinkPulse{% endblock %}
+{% block content %}
+<section class="auth-card card">
+  <h1>Delete this link?</h1>
+  <p><strong>{{ link.title|default:link.code }}</strong> (<code>/r/{{ link.code }}</code>) and all of its click history will be deleted. Anyone who still has the short link will see a "not found" page.</p>
+  <form method="post" class="form-actions">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">Delete link</button>
+    <a class="btn btn-quiet" href="{% url 'links:detail' link.pk %}">Keep it</a>
+  </form>
+</section>
+{% endblock %}

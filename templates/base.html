@@ -1,0 +1,61 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="{% block description %}LinkPulse turns every campaign link into a tracked short link, so you can see which post, email or ad really brings visitors.{% endblock %}">
+  <title>{% block title %}LinkPulse{% endblock %}</title>
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <script src="{% static 'js/app.js' %}" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  {% with view=request.resolver_match.view_name %}
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="{% if user.is_authenticated %}{% url 'links:dashboard' %}{% else %}{% url 'home' %}{% endif %}">
+        <svg class="brand-mark" viewBox="0 0 32 32" width="26" height="26" aria-hidden="true"><rect width="32" height="32" rx="7" class="brand-bg"/><path d="M4 18h5l3-9 5 15 3-10 2 4h6" class="brand-line"/></svg>
+        <span>LinkPulse</span>
+      </a>
+      {% if user.is_authenticated %}
+      <nav class="nav" aria-label="Main">
+        <a href="{% url 'links:dashboard' %}" {% if view == 'links:dashboard' %}aria-current="page"{% endif %}>Dashboard</a>
+        <a href="{% url 'links:list' %}" {% if view == 'links:list' or view == 'links:detail' or view == 'links:edit' %}aria-current="page"{% endif %}>Links</a>
+        <a href="{% url 'accounts:api-keys' %}" {% if view == 'accounts:api-keys' or view == 'accounts:api-key-create' %}aria-current="page"{% endif %}>API</a>
+      </nav>
+      <div class="topbar-actions">
+        <a class="btn btn-primary btn-small" href="{% url 'links:create' %}">New link</a>
+        <details class="account-menu">
+          <summary><span class="avatar" aria-hidden="true">{{ user.username|slice:":1"|upper }}</span><span class="visually-hidden">Account menu for </span>{{ user.username }}</summary>
+          <div class="menu">
+            <a href="{% url 'accounts:password-change' %}">Change password</a>
+            <a href="{% url 'links:export' %}">Export links (CSV)</a>
+            <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">Log out</button></form>
+          </div>
+        </details>
+      </div>
+      {% else %}
+      <div class="topbar-actions">
+        <a class="btn btn-quiet btn-small" href="{% url 'accounts:login' %}">Log in</a>
+        <a class="btn btn-primary btn-small" href="{% url 'accounts:register' %}">Sign up</a>
+      </div>
+      {% endif %}
+    </div>
+  </header>
+  {% endwith %}
+
+  <main id="main" class="container">
+    {% include 'partials/messages.html' %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>LinkPulse. Visitors are counted without storing IP addresses.</span>
+      <span class="muted">Built by Sagar Bahadur Shahi</span>
+    </div>
+  </footer>
+</body>
+</html>

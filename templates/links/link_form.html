@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}{% if editing %}Edit link{% else %}New link{% endif %} · LinkPulse{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{% if editing %}Edit link{% else %}New link{% endif %}</h1>
+    <p class="muted">{% if editing %}The short code stays the same, so links you already shared keep working.{% else %}Paste the page you want to promote, then describe where you will share it.{% endif %}</p>
+  </div>
+</div>
+
+<form class="card form-card" method="post" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
+
+  <fieldset>
+    <legend>Destination</legend>
+    {% include 'partials/field.html' with field=form.destination_url %}
+    {% include 'partials/field.html' with field=form.title %}
+  </fieldset>
+
+  <fieldset>
+    <legend>Campaign tags</legend>
+    <div class="presets" role="group" aria-label="Fill source and medium">
+      <span class="muted">Quick fill</span>
+      <button type="button" class="chip" data-source="facebook" data-medium="social">Facebook</button>
+      <button type="button" class="chip" data-source="instagram" data-medium="social">Instagram</button>
+      <button type="button" class="chip" data-source="linkedin" data-medium="social">LinkedIn</button>
+      <button type="button" class="chip" data-source="google" data-medium="cpc">Google Ads</button>
+      <button type="button" class="chip" data-source="newsletter" data-medium="email">Email</button>
+      <button type="button" class="chip" data-source="whatsapp" data-medium="messaging">WhatsApp</button>
+    </div>
+    <div class="form-grid">
+      {% include 'partials/field.html' with field=form.utm_source %}
+      {% include 'partials/field.html' with field=form.utm_medium %}
+      {% include 'partials/field.html' with field=form.utm_campaign %}
+      {% include 'partials/field.html' with field=form.utm_content %}
+      {% include 'partials/field.html' with field=form.utm_term %}
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Short link</legend>
+    <div class="form-grid">
+      {% if editing %}
+      <div class="field"><label>Short code</label><p class="static-value"><code>{{ link.code }}</code></p><p class="help">The code cannot be changed after the link is created.</p></div>
+      <div class="visually-hidden">{{ form.code }}</div>
+      {% else %}
+      {% include 'partials/field.html' with field=form.code %}
+      {% endif %}
+      {% include 'partials/field.html' with field=form.expires_at %}
+    </div>
+    <div class="field checkbox">
+      <label for="{{ form.is_active.id_for_label }}">{{ form.is_active }} {{ form.is_active.label }}</label>
+      {% for error in form.is_active.errors %}<p class="error">{{ error }}</p>{% endfor %}
+    </div>
+  </fieldset>
+
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">{% if editing %}Save changes{% else %}Create short link{% endif %}</button>
+    <a class="btn btn-quiet" href="{% if editing %}{% url 'links:detail' link.pk %}{% else %}{% url 'links:list' %}{% endif %}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,15 @@
+<figure class="chart">
+  <svg class="chart-svg" viewBox="0 0 {{ chart.width }} {{ chart.height }}" role="img" aria-label="Bar chart of clicks per day. {{ chart.description }}">
+    {% for tick in chart.ticks %}
+    <line class="chart-grid" x1="{{ chart.left }}" x2="{{ chart.right_edge }}" y1="{{ tick.y }}" y2="{{ tick.y }}"/>
+    <text class="chart-label" x="{{ chart.left }}" dx="-6" y="{{ tick.y }}" dy="4" text-anchor="end">{{ tick.value }}</text>
+    {% endfor %}
+    {% for bar in chart.bars %}
+    <rect class="chart-bar{% if bar.count == 0 %} is-empty{% endif %}" x="{{ bar.x }}" y="{{ bar.y }}" width="{{ bar.w }}" height="{{ bar.h }}" rx="1.5"><title>{{ bar.label }}: {{ bar.count }} click{{ bar.count|pluralize }}</title></rect>
+    {% endfor %}
+    {% for label in chart.x_labels %}
+    <text class="chart-label" x="{{ label.x }}" y="{{ label.y }}" text-anchor="middle">{{ label.text }}</text>
+    {% endfor %}
+  </svg>
+  <figcaption class="visually-hidden">{{ chart.description }}</figcaption>
+</figure>

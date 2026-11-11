@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}LinkPulse{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-text">
+    <p class="eyebrow">Campaign link tracking</p>
+    <h1>Know which post, email or ad brought the visitor.</h1>
+    <p class="lead">LinkPulse gives every campaign link a short address and tags it for your analytics. You see clicks, where people came from and what device they used, without storing anyone's IP address.</p>
+    <div class="hero-actions">
+      {% if user.is_authenticated %}
+      <a class="btn btn-primary" href="{% url 'links:dashboard' %}">Open your dashboard</a>
+      {% else %}
+      <a class="btn btn-primary" href="{% url 'accounts:register' %}">Create a free account</a>
+      <a class="btn btn-quiet" href="{% url 'accounts:login' %}">Log in</a>
+      {% endif %}
+    </div>
+  </div>
+  <figure class="hero-demo" aria-label="Example of a tagged short link">
+    <p class="demo-label">You paste</p>
+    <p class="demo-url">https://example.com/offers/tihar</p>
+    <p class="demo-label">You share</p>
+    <p class="demo-url demo-short">{{ request.get_host }}/r/<strong>tihar-fb</strong></p>
+    <p class="demo-label">Visitors land on</p>
+    <p class="demo-url">https://example.com/offers/tihar?<span class="t1">utm_source=facebook</span>&amp;<span class="t2">utm_medium=social</span>&amp;<span class="t3">utm_campaign=tihar-offer-2026</span></p>
+  </figure>
+</section>
+
+<section class="features" aria-label="What you get">
+  <article class="card">
+    <h2 class="card-title">Tags that stay consistent</h2>
+    <p>Source, medium and campaign are tidied into lowercase with hyphens, so "Facebook" and "facebook" never split your report in two.</p>
+  </article>
+  <article class="card">
+    <h2 class="card-title">Real people only</h2>
+    <p>Bots and link-preview crawlers are detected and kept out of the numbers. Visitors are counted with a daily one-way hash, never an IP address.</p>
+  </article>
+  <article class="card">
+    <h2 class="card-title">An API when you need one</h2>
+    <p>Create links and read stats from a spreadsheet script or an automation tool, using a key you can revoke at any time.</p>
+  </article>
+</section>
+{% endblock %}

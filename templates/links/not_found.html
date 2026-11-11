@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Link not found · LinkPulse{% endblock %}
+{% block content %}
+<section class="auth-card card center">
+  <p class="status-code">404</p>
+  <h1>This short link does not exist</h1>
+  <p class="muted">Check the address for a typo, or ask the person who shared it for a new link.</p>
+  <a class="btn btn-quiet" href="{% url 'home' %}">Go to LinkPulse</a>
+</section>
+{% endblock %}

@@ -1,0 +1,16 @@
+<section class="card breakdown">
+  <h2 class="card-title">{{ title }}</h2>
+  {% if rows %}
+  <ul class="breakdown-list">
+    {% for row in rows %}
+    <li>
+      <span class="breakdown-name" title="{{ row.name }}">{{ row.name }}</span>
+      <span class="breakdown-n">{{ row.n }}</span>
+      <progress class="meter" max="{{ rows.0.n }}" value="{{ row.n }}" aria-label="{{ row.name }}: {{ row.n }}"></progress>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">{{ empty }}</p>
+  {% endif %}
+</section>
