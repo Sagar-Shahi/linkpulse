@@ -1,5 +1,7 @@
 # LinkPulse
 
+**Portfolio:** [https://sagar-shahi.github.io/](https://sagar-shahi.github.io/)
+
 Campaign link tracking for marketers. Turn any web address into a tagged short link,
 then see which post, email or ad really brings visitors. Built with Django 5.2 and
 Django REST Framework, with privacy and security as design constraints rather than afterthoughts.
@@ -93,4 +95,4 @@ Rate limits use Django's cache; with several server processes, configure a share
 ## Project layout
 `core/` security headers, throttling, admin lockout, error pages · `accounts/` registration, login, API keys · `links/` models, validators, tracking, analytics, views, API · `templates/`, `static/` frontend · `.github/workflows/ci.yml` tests, deploy check, bandit, pip-audit.
 
-Built by Sagar Bahadur Shahi.
+Built by [Sagar Bahadur Shahi](https://sagar-shahi.github.io/). See more of my work at [https://sagar-shahi.github.io/](https://sagar-shahi.github.io/).
