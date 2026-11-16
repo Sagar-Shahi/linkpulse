@@ -19,6 +19,18 @@ class DestinationUrlTests(SimpleTestCase):
             with self.subTest(url=url), self.assertRaises(ValidationError):
                 validate_destination_url(url)
 
+    def test_localhost_style_hostnames_are_refused(self):
+        for url in ('http://localhost.localdomain/', 'http://localhost.example/', 'http://printer.localdomain/', 'http://localhost/'):
+            with self.subTest(url=url), self.assertRaises(ValidationError):
+                validate_destination_url(url)
+
+    @override_settings(BLOCKED_DESTINATION_DOMAINS=['bad.example'])
+    def test_blocklisted_domains_and_their_subdomains_are_refused(self):
+        for url in ('https://bad.example/x', 'https://www.bad.example/', 'https://A.B.BAD.example/'):
+            with self.subTest(url=url), self.assertRaises(ValidationError):
+                validate_destination_url(url)
+        validate_destination_url('https://notbad.example/')
+
     def test_embedded_passwords_are_refused(self):
         for url in ('https://user:pass@example.org/', 'https://user@example.org/', 'https://example.org@evil.example/'):
             with self.subTest(url=url), self.assertRaises(ValidationError):

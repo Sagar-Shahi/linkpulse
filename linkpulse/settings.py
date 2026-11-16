@@ -52,6 +52,8 @@ if not SECRET_KEY:
     SECRET_KEY = 'insecure-development-key-set-DJANGO_SECRET_KEY-for-real-use'  # nosec B105 - dev-only fallback, production refuses to start without a real key
 
 ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS')
+# Websites that short links may never point to (abuse blocklist). Comma separated, subdomains included.
+BLOCKED_DESTINATION_DOMAINS = [d.lower().lstrip('.') for d in env_list('LINKPULSE_BLOCKED_DOMAINS')]
 if DEBUG and not ALLOWED_HOSTS:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 if PRODUCTION and not ALLOWED_HOSTS:

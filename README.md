@@ -32,7 +32,7 @@ python manage.py runserver
 ```
 Open http://127.0.0.1:8000/. Create an account, or log in as the demo user printed by `seed_demo`.
 
-Run the tests: `python manage.py test` (189 tests, no setup needed).
+Run the tests: `python manage.py test` (191 tests, no setup needed).
 
 ## API
 Create a key on the **API** page (shown once, stored only as a SHA-256 hash). Send it as a Bearer token.
@@ -91,6 +91,18 @@ See [SECURITY.md](SECURITY.md) to report a problem.
 
 A `Dockerfile` (non-root user) is included. It has not been built in the environment where this was written, so test it before relying on it.
 Rate limits use Django's cache; with several server processes, configure a shared cache such as Redis for exact limits.
+
+## Abuse protection
+A link shortener can be misused for phishing, so destinations are checked: only http/https, no private or local hostnames (including `localhost.*` and `*.localdomain`), no embedded passwords, and never LinkPulse itself.
+Operators can also block websites outright with `LINKPULSE_BLOCKED_DOMAINS=bad.example,other.example` (subdomains included).
+Not included yet: automatic checks against a reputation service such as Google Safe Browsing, and a public "report this link" page. See the limitations below.
+
+## Known limitations and next steps
+- Hostnames are checked by name only. A public domain whose DNS points at a private address is not detected, but LinkPulse never fetches destinations itself, so the server is not exposed to it.
+- No reputation check or "report abuse" page yet. Planned: Safe Browsing lookup and a report form.
+- Rate limits use the local cache, so exact limits across several server processes need a shared cache such as Redis.
+- The Docker image has not been built in the environment where this was written; test it before relying on it.
+- Security checks are automated scans and tests written by the author, not an independent penetration test.
 
 ## Project layout
 `core/` security headers, throttling, admin lockout, error pages · `accounts/` registration, login, API keys · `links/` models, validators, tracking, analytics, views, API · `templates/`, `static/` frontend · `.github/workflows/ci.yml` tests, deploy check, bandit, pip-audit.

@@ -16,7 +16,7 @@ _CONTROL_OR_SPACE = re.compile(r'[\x00-\x20\x7f]')
 _CODE_RE = re.compile(r'^[a-z0-9][a-z0-9_-]{2,31}$')
 _UTM_RE = re.compile(r'^[a-z0-9._-]{1,100}$')
 _HAS_LETTER = re.compile(r'[a-z]')
-_BLOCKED_SUFFIXES = ('.local', '.localhost', '.internal', '.lan', '.home', '.corp', '.intranet', '.test', '.invalid')
+_BLOCKED_SUFFIXES = ('.local', '.localhost', '.internal', '.lan', '.home', '.corp', '.intranet', '.test', '.invalid', '.localdomain', '.broadcasthost')
 
 
 def _is_own_host(host):
@@ -67,10 +67,15 @@ def validate_destination_url(value):
         if (
             '.' not in host
             or host == 'localhost'
+            or host.startswith('localhost.')
             or host.endswith(_BLOCKED_SUFFIXES)
             or not _HAS_LETTER.search(last_label)
         ):
             raise ValidationError('Use a public website address, for example https://example.com/page.', code='private')
+
+    for blocked in getattr(settings, 'BLOCKED_DESTINATION_DOMAINS', []):
+        if host == blocked or host.endswith('.' + blocked):
+            raise ValidationError('Links to this website are not allowed.', code='blocked')
 
     if _is_own_host(host):
         raise ValidationError('A short link cannot point back at LinkPulse itself.', code='self')
