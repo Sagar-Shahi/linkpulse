@@ -18,6 +18,23 @@
 {% else %}
 {% include 'partials/stats.html' %}
 
+{% if campaign_rows %}
+<section class="card">
+  <div class="card-head">
+    <h2 class="card-title">Campaigns{% if trend.percent is not None %} <span class="trend trend-{{ trend.status }}">{{ trend.percent_text }}</span> <span class="muted small">vs the previous {{ days }} days</span>{% endif %}</h2>
+    <a href="{% url 'links:campaigns' %}">Full comparison</a>
+  </div>
+  <ol class="rank-list">
+    {% for row in campaign_rows %}
+    <li>
+      <a class="rank-main" href="{% url 'links:list' %}?q={{ row.name|urlencode }}"><span class="rank-title">{{ row.name }}</span></a>
+      <span class="rank-n">{{ row.clicks }} click{{ row.clicks|pluralize }} <span class="badge trend-badge-{{ row.status }}">{% if row.status == 'up' %}Growing{% elif row.status == 'down' %}Falling{% elif row.status == 'new' %}New{% elif row.status == 'stopped' %}Stopped{% else %}Steady{% endif %}</span></span>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
 <section class="card">
   <h2 class="card-title">Clicks per day</h2>
   {% include 'partials/chart.html' %}

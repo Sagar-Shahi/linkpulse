@@ -107,6 +107,9 @@ def change_percent(now, before):
     return round((now - before) * 100 / before)
 
 
+STATUS_LABELS = {'up': 'Growing', 'down': 'Falling', 'new': 'New', 'stopped': 'Stopped', 'steady': 'Steady'}
+
+
 def percent_text(percent):
     """'+12%', '-30%', or '+999%+' for a huge jump, so a small baseline does not print silly numbers."""
     if percent is None:

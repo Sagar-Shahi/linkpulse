@@ -6,7 +6,11 @@
     <h1>Campaigns</h1>
     <p class="muted">The last {{ days }} days compared with the {{ days }} days before. Clicks from real people only.</p>
   </div>
-  {% include 'partials/period.html' %}
+  <div class="head-actions no-print">
+    {% include 'partials/period.html' %}
+    {% if report %}<a class="btn btn-quiet btn-small" href="{% url 'links:campaigns-export' %}?days={{ days }}">Export CSV</a>
+    <button type="button" class="btn btn-quiet btn-small" data-print>Print or save as PDF</button>{% endif %}
+  </div>
 </div>
 
 {% if not report %}
@@ -16,64 +20,6 @@
   <a class="btn btn-primary" href="{% url 'links:create' %}">Create a link</a>
 </section>
 {% else %}
-<dl class="stats">
-  <div class="stat"><dt>Clicks, last {{ days }} days</dt><dd>{{ trend.now }}</dd>
-    <dd class="stat-note">{% if trend.percent is None %}No earlier period to compare with{% else %}<span class="trend trend-{{ trend.status }}">{{ trend.percent_text }}</span> vs the previous {{ days }} days ({{ trend.before }}){% endif %}</dd></div>
-  <div class="stat"><dt>Campaigns with clicks</dt><dd>{{ report|length }}</dd></div>
-</dl>
-
-{% if insights %}
-<section class="card">
-  <h2 class="card-title">What to look at</h2>
-  <ul class="insights">
-    {% for line in insights %}<li>{{ line }}</li>{% endfor %}
-  </ul>
-</section>
-{% endif %}
-
-<section class="card">
-  <h2 class="card-title">Campaign comparison</h2>
-  <div class="table-wrap">
-    <table class="table">
-      <thead><tr>
-        <th scope="col">Campaign</th><th scope="col" class="num">Clicks</th><th scope="col" class="num">Before</th>
-        <th scope="col" class="num">Change</th><th scope="col" class="num">Visitors</th><th scope="col" class="num">Links</th><th scope="col">Trend</th>
-      </tr></thead>
-      <tbody>
-        {% for row in report %}
-        <tr>
-          <td><a href="{% url 'links:list' %}?q={{ row.name|urlencode }}">{{ row.name }}</a></td>
-          <td class="num">{{ row.clicks }}</td>
-          <td class="num">{{ row.before }}</td>
-          <td class="num">{% if row.percent is None %}{% if row.clicks %}new{% else %}-{% endif %}{% else %}{{ row.percent_text }}{% endif %}</td>
-          <td class="num">{{ row.people }}</td>
-          <td class="num">{{ row.links }}</td>
-          <td><span class="badge trend-badge-{{ row.status }}">{% if row.status == 'up' %}Growing{% elif row.status == 'down' %}Falling{% elif row.status == 'new' %}New{% elif row.status == 'stopped' %}Stopped{% else %}Steady{% endif %}</span></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  <p class="muted small">Visitors are counted per day with a salted hash, so one person on two days counts twice. No IP address is stored.</p>
-</section>
-
-<section class="card">
-  <h2 class="card-title">Links losing clicks</h2>
-  {% if losing %}
-  <ol class="rank-list">
-    {% for link in losing %}
-    <li>
-      <a class="rank-main" href="{% url 'links:detail' link.pk %}">
-        <span class="rank-title">{{ link.title|default:link.code }}</span>
-        <span class="rank-sub muted">/r/{{ link.code }}</span>
-      </a>
-      <span class="rank-n">{{ link.percent }}% ({{ link.before }} to {{ link.now }})</span>
-    </li>
-    {% endfor %}
-  </ol>
-  {% else %}
-  <p class="muted">No link lost a large share of its clicks. A link needs at least 5 clicks in the earlier period to be judged.</p>
-  {% endif %}
-</section>
+{% include 'partials/campaign_report.html' %}
 {% endif %}
 {% endblock %}

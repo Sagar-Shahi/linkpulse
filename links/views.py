@@ -14,7 +14,7 @@ from django.views.decorators.http import require_POST, require_safe
 
 from core import throttle
 
-from . import analytics
+from . import analytics, demo as demo_data, health
 from .forms import LinkForm
 from .models import Click, Link
 from .qr import qr_svg
@@ -104,6 +104,8 @@ def dashboard(request):
         'referrers': analytics.top_referrers(clicks, days),
         'devices': analytics.device_breakdown(clicks, days),
         'campaigns': analytics.top_campaigns(clicks, days),
+        'campaign_rows': analytics.campaign_report(clicks, days)[:3],
+        'trend': analytics.overall_trend(clicks, days),
         'top_links': top_links,
         'link_count': _own_links(request.user).count(),
         'recent_links': _own_links(request.user)[:5],
@@ -128,6 +130,49 @@ def campaigns(request):
         'losing': analytics.losing_links(_own_links(request.user), days),
         'link_count': _own_links(request.user).count(),
     })
+
+
+@login_required
+@require_safe
+def export_campaigns_csv(request):
+    days = _period(request)
+    report = analytics.campaign_report(Click.objects.filter(link__owner=request.user), days)
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="linkpulse-campaigns-{days}d.csv"'
+    writer = csv.writer(response)
+    writer.writerow([
+        'campaign', f'clicks_last_{days}_days', f'clicks_previous_{days}_days', 'difference', 'change',
+        'unique_visitors_per_day', 'links_with_clicks', 'trend',
+    ])
+    for row in report:
+        writer.writerow([
+            _csv_safe(row['name']), row['clicks'], row['before'], row['difference'], row['percent_text'] or 'n/a',
+            row['people'], row['links'], analytics.STATUS_LABELS[row['status']],
+        ])
+    return response
+
+
+@require_safe
+def demo(request):
+    """A public sample report built from made-up numbers. No account needed, no real data shown."""
+    report, trend, insights, losing = demo_data.sample_report()
+    return render(request, 'links/demo.html', {
+        'days': 30, 'report': report, 'trend': trend, 'insights': insights, 'losing': losing, 'demo': True,
+    })
+
+
+@login_required
+@require_POST
+def link_check(request, pk):
+    """Check whether the destination still works. Rate limited, and the request is SSRF-protected."""
+    link = get_object_or_404(_own_links(request.user), pk=pk)
+    if throttle.exceeded(throttle.make_key('check', request.user.pk), 10, 3600):
+        messages.error(request, 'You can check 10 destinations an hour. Please try again later.')
+        return redirect('links:detail', pk=link.pk)
+    result = health.check(link.destination_url)
+    link.health_status, link.health_code, link.health_checked_at = result['status'], result['code'], timezone.now()
+    link.save(update_fields=['health_status', 'health_code', 'health_checked_at'])
+    return redirect('links:detail', pk=link.pk)
 
 
 @login_required

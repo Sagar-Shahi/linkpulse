@@ -31,6 +31,10 @@ class Link(models.Model):
 
     is_active = models.BooleanField(default=True)
     expires_at = models.DateTimeField(null=True, blank=True)
+    # Result of the owner's last "Check destination" (see health.py). Empty until a check is run.
+    health_status = models.CharField(max_length=12, blank=True)
+    health_code = models.PositiveSmallIntegerField(null=True, blank=True)
+    health_checked_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -73,6 +77,11 @@ class Link(models.Model):
         if self.is_expired:
             return 'expired'
         return 'live' if self.is_active else 'paused'
+
+    @property
+    def health_label(self):
+        from .health import LABELS
+        return LABELS.get(self.health_status, '')
 
     @property
     def target_url(self):

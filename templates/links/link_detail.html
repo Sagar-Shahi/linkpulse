@@ -41,6 +41,20 @@
   </div>
 </section>
 
+<section class="card health-card">
+  <div>
+    <h2 class="card-title">Destination health</h2>
+    {% if link.health_status %}
+    <p><span class="badge health-{{ link.health_status }}">{{ link.health_label }}</span>
+      {% if link.health_code %}<span class="muted">HTTP {{ link.health_code }}</span>{% endif %}
+      <span class="muted">· checked {{ link.health_checked_at|date:"M j, H:i" }}</span></p>
+    {% else %}
+    <p class="muted">Not checked yet. LinkPulse only visits the destination when you press the button.</p>
+    {% endif %}
+  </div>
+  <form method="post" action="{% url 'links:check' link.pk %}">{% csrf_token %}<button class="btn btn-quiet btn-small" type="submit">Check destination</button></form>
+</section>
+
 <div class="page-head compact">
   <h2>Performance</h2>
   {% include 'partials/period.html' %}

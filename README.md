@@ -20,6 +20,9 @@ Django REST Framework, with privacy and security as design constraints rather th
 - **Privacy by design**: no IP address or user-agent is stored. A click keeps only the referrer *site name*, a device class and a daily salted hash used to count unique visitors.
 - **REST API** with API keys (`/api/v1/`) for links and stats.
 - **Campaign intelligence**: a Campaigns page ranks your campaigns, compares the last 7/30/90 days with the same-length period before, labels each Growing, Steady, Falling, New or Stopped, writes a few plain "what to look at" lines, and lists links that lost 30% or more of their clicks.
+- **Destination health check**: a "Check destination" button tells you if a link's page still works (working, blocks automated checks, broken, unreachable). It only runs when you press it, 10 times an hour per user. Because the server makes that request, it is protected against server-side request forgery: every address and every redirect is re-validated, the host name is resolved to public IPs only, the connection goes to that exact IP (no DNS rebinding), at most 3 redirects, 5 second timeouts, HEAD requests, and page content is never read or stored.
+- **Public sample report** at `/demo/`, built from made-up numbers, so anyone can see the product without signing up.
+- **Campaign export**: download the comparison as CSV, or print it / save it as a PDF from the browser.
 - **QR codes** for every link, generated on the server (no third-party service), downloadable as SVG. Scans open the short link, so they are counted like any click.
 - **CSV export** of your links and click counts.
 - Light and dark theme, responsive layout, no JavaScript charting library (charts are server-rendered SVG), system fonts only.
@@ -35,7 +38,7 @@ python manage.py runserver
 ```
 Open http://127.0.0.1:8000/. Create an account, or log in as the demo user printed by `seed_demo`.
 
-Run the tests: `python manage.py test` (220 tests, no setup needed).
+Run the tests: `python manage.py test` (253 tests, no setup needed).
 
 ## API
 Create a key on the **API** page (shown once, stored only as a SHA-256 hash). Send it as a Bearer token.
@@ -106,7 +109,7 @@ Click rows are kept for `CLICK_RETENTION_DAYS` (default 365; `0` keeps everythin
 ## Known limitations and next steps
 - Visitors are counted per day, so one person returning on two days counts twice. Country analytics are not offered because they would need the visitor's IP address, which LinkPulse never stores.
 - Campaign comparison needs a campaign name on the link, and a drop is only called a drop when the earlier period had at least 5 clicks.
-- Hostnames are checked by name only. A public domain whose DNS points at a private address is not detected, but LinkPulse never fetches destinations itself, so the server is not exposed to it.
+- When a link is created, hostnames are checked by name only, so a public domain whose DNS points at a private address is accepted. That is safe for redirects, because visitors' browsers make the request. The owner-initiated destination check resolves the name itself and refuses private addresses.
 - No reputation check or "report abuse" page yet. Planned: Safe Browsing lookup and a report form.
 - Rate limits use the local cache, so exact limits across several server processes need a shared cache such as Redis.
 - Security checks are automated scans and tests written by the author, not an independent penetration test.

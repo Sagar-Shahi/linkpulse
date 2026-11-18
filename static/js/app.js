@@ -36,6 +36,13 @@
       return;
     }
 
+    // Print buttons: <button data-print>
+    if (event.target.closest('[data-print]')) {
+      event.preventDefault();
+      window.print();
+      return;
+    }
+
     // Quick-fill chips on the link form: <button class="chip" data-source="facebook" data-medium="social">
     var chip = event.target.closest('.chip[data-source]');
     if (chip) {

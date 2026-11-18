@@ -345,3 +345,16 @@ input:focus, select:focus, textarea:focus { outline: 3px solid var(--focus); out
 .trend-badge-down, .trend-badge-stopped { background: var(--warn-soft); color: var(--warn); }
 .trend-badge-steady { background: var(--surface-2); color: var(--muted); }
 @media (max-width: 560px) { .qr-card { flex-direction: column; align-items: flex-start; } }
+
+/* Destination health and printing */
+.health-card { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.health-card .card-title { margin-bottom: 8px; }
+.health-ok { background: var(--good-soft); color: var(--good); }
+.health-restricted { background: var(--warn-soft); color: var(--warn); }
+.health-broken, .health-unreachable { background: #fde8e8; color: #b42318; }
+.head-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+@media print {
+  .topbar, .site-footer, .skip-link, .no-print, .btn, form { display: none !important; }
+  body { background: #fff; color: #000; }
+  .card, .stat { box-shadow: none; border: 1px solid #bbb; break-inside: avoid; }
+}
