@@ -23,6 +23,7 @@
       <nav class="nav" aria-label="Main">
         <a href="{% url 'links:dashboard' %}" {% if view == 'links:dashboard' %}aria-current="page"{% endif %}>Dashboard</a>
         <a href="{% url 'links:list' %}" {% if view == 'links:list' or view == 'links:detail' or view == 'links:edit' %}aria-current="page"{% endif %}>Links</a>
+        <a href="{% url 'links:campaigns' %}" {% if view == 'links:campaigns' %}aria-current="page"{% endif %}>Campaigns</a>
         <a href="{% url 'accounts:api-keys' %}" {% if view == 'accounts:api-keys' or view == 'accounts:api-key-create' %}aria-current="page"{% endif %}>API</a>
       </nav>
       <div class="topbar-actions">

@@ -32,6 +32,15 @@
   </div>
 </section>
 
+<section class="card qr-card">
+  <img class="qr-img" src="{% url 'links:qr' link.pk %}" width="160" height="160" alt="QR code for {{ short_url }}">
+  <div>
+    <h2 class="card-title">QR code</h2>
+    <p class="muted">Print it on a flyer, a poster or a receipt. Scans open this short link, so they are counted like any other click.</p>
+    <a class="btn btn-quiet btn-small" href="{% url 'links:qr' link.pk %}?download=1">Download SVG</a>
+  </div>
+</section>
+
 <div class="page-head compact">
   <h2>Performance</h2>
   {% include 'partials/period.html' %}

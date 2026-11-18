@@ -19,6 +19,8 @@ Django REST Framework, with privacy and security as design constraints rather th
 - **Analytics** for 7/30/90 days: clicks per day, unique visitors, referrers, devices, campaigns, top links, latest clicks. Bots and link-preview crawlers are detected and left out of every number.
 - **Privacy by design**: no IP address or user-agent is stored. A click keeps only the referrer *site name*, a device class and a daily salted hash used to count unique visitors.
 - **REST API** with API keys (`/api/v1/`) for links and stats.
+- **Campaign intelligence**: a Campaigns page ranks your campaigns, compares the last 7/30/90 days with the same-length period before, labels each Growing, Steady, Falling, New or Stopped, writes a few plain "what to look at" lines, and lists links that lost 30% or more of their clicks.
+- **QR codes** for every link, generated on the server (no third-party service), downloadable as SVG. Scans open the short link, so they are counted like any click.
 - **CSV export** of your links and click counts.
 - Light and dark theme, responsive layout, no JavaScript charting library (charts are server-rendered SVG), system fonts only.
 
@@ -33,7 +35,7 @@ python manage.py runserver
 ```
 Open http://127.0.0.1:8000/. Create an account, or log in as the demo user printed by `seed_demo`.
 
-Run the tests: `python manage.py test` (197 tests, no setup needed).
+Run the tests: `python manage.py test` (220 tests, no setup needed).
 
 ## API
 Create a key on the **API** page (shown once, stored only as a SHA-256 hash). Send it as a Bearer token.
@@ -90,7 +92,7 @@ See [SECURITY.md](SECURITY.md) to report a problem.
 3. `python manage.py migrate && python manage.py collectstatic --noinput`, then `gunicorn linkpulse.wsgi`.
 4. Check with `python manage.py check --deploy`.
 
-A `Dockerfile` (non-root user) is included. It has not been built in the environment where this was written, so test it before relying on it.
+A `Dockerfile` (non-root user) is included. It runs migrations on start and honours `PORT`; it builds and runs on Render's free tier.
 Rate limits use Django's cache; with several server processes, configure a shared cache such as Redis for exact limits.
 
 ## Abuse protection
@@ -102,10 +104,11 @@ Not included yet: automatic checks against a reputation service such as Google S
 Click rows are kept for `CLICK_RETENTION_DAYS` (default 365; `0` keeps everything). Remove older rows with `python manage.py prune_clicks` (add `--dry-run` to preview), ideally on a weekly schedule.
 
 ## Known limitations and next steps
+- Visitors are counted per day, so one person returning on two days counts twice. Country analytics are not offered because they would need the visitor's IP address, which LinkPulse never stores.
+- Campaign comparison needs a campaign name on the link, and a drop is only called a drop when the earlier period had at least 5 clicks.
 - Hostnames are checked by name only. A public domain whose DNS points at a private address is not detected, but LinkPulse never fetches destinations itself, so the server is not exposed to it.
 - No reputation check or "report abuse" page yet. Planned: Safe Browsing lookup and a report form.
 - Rate limits use the local cache, so exact limits across several server processes need a shared cache such as Redis.
-- The Docker image has not been built in the environment where this was written; test it before relying on it.
 - Security checks are automated scans and tests written by the author, not an independent penetration test.
 
 ## Project layout

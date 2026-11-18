@@ -17,6 +17,7 @@ from core import throttle
 from . import analytics
 from .forms import LinkForm
 from .models import Click, Link
+from .qr import qr_svg
 from .tracking import record_click
 
 PERIODS = (7, 30, 90)
@@ -108,6 +109,37 @@ def dashboard(request):
         'recent_links': _own_links(request.user)[:5],
     }
     return render(request, 'links/dashboard.html', context)
+
+
+@login_required
+@require_safe
+def campaigns(request):
+    """Campaign intelligence: which campaigns work, how they moved, and which links are fading."""
+    days = _period(request)
+    clicks = Click.objects.filter(link__owner=request.user)
+    report = analytics.campaign_report(clicks, days)
+    trend = analytics.overall_trend(clicks, days)
+    return render(request, 'links/campaigns.html', {
+        'days': days,
+        'periods': PERIODS,
+        'report': report,
+        'trend': trend,
+        'insights': analytics.insights(report, trend, days),
+        'losing': analytics.losing_links(_own_links(request.user), days),
+        'link_count': _own_links(request.user).count(),
+    })
+
+
+@login_required
+@require_safe
+def link_qr(request, pk):
+    """The link's QR code as an image. Only the owner can fetch it."""
+    link = get_object_or_404(_own_links(request.user), pk=pk)
+    response = HttpResponse(qr_svg(_short_url(request, link)), content_type='image/svg+xml')
+    response['Cache-Control'] = 'private, no-store'
+    if request.GET.get('download'):
+        response['Content-Disposition'] = f'attachment; filename="linkpulse-{link.code}-qr.svg"'
+    return response
 
 
 @login_required

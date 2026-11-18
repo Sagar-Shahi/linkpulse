@@ -333,3 +333,15 @@ input:focus, select:focus, textarea:focus { outline: 3px solid var(--focus); out
 @media (prefers-reduced-motion: no-preference) {
   .btn, .chip, .nav a, .segmented a { transition: background-color 0.15s, border-color 0.15s, color 0.15s; }
 }
+
+/* Campaign intelligence and QR codes */
+.qr-card { display: flex; gap: 20px; align-items: center; }
+.qr-img { background: #fff; border-radius: 8px; padding: 6px; flex: none; width: 160px; height: 160px; }
+.insights { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
+.small { font-size: 0.82rem; }
+.trend-up { color: var(--good); font-weight: 700; }
+.trend-down, .trend-stopped { color: var(--warn); font-weight: 700; }
+.trend-badge-up, .trend-badge-new { background: var(--good-soft); color: var(--good); }
+.trend-badge-down, .trend-badge-stopped { background: var(--warn-soft); color: var(--warn); }
+.trend-badge-steady { background: var(--surface-2); color: var(--muted); }
+@media (max-width: 560px) { .qr-card { flex-direction: column; align-items: flex-start; } }

@@ -18,6 +18,7 @@ class LoginRequiredTests(TestCase):
             reverse('links:dashboard'), reverse('links:list'), reverse('links:create'), reverse('links:export'),
             reverse('links:detail', args=[link.pk]), reverse('links:edit', args=[link.pk]),
             reverse('links:delete', args=[link.pk]), reverse('links:toggle', args=[link.pk]),
+            reverse('links:campaigns'), reverse('links:qr', args=[link.pk]),
         ]
         for url in urls:
             with self.subTest(url=url):
