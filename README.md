@@ -3,7 +3,7 @@
 **Live demo:** [https://linkpulse-xy0s.onrender.com](https://linkpulse-xy0s.onrender.com) (free hosting, the first visit can take about a minute to wake up)  
 **Portfolio:** [https://sagar-shahi.github.io/](https://sagar-shahi.github.io/)
 
-**Built with AI assistance (Claude).** I designed the features, reviewed and tested the code, and deployed it.
+**Built with AI assistance.** I designed the features, reviewed and tested the code, and deployed it.
 
 Campaign link tracking for marketers. Turn any web address into a tagged short link,
 then see which post, email or ad really brings visitors. Built with Django 5.2 and
