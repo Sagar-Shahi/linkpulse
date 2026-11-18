@@ -32,7 +32,7 @@ python manage.py runserver
 ```
 Open http://127.0.0.1:8000/. Create an account, or log in as the demo user printed by `seed_demo`.
 
-Run the tests: `python manage.py test` (191 tests, no setup needed).
+Run the tests: `python manage.py test` (197 tests, no setup needed).
 
 ## API
 Create a key on the **API** page (shown once, stored only as a SHA-256 hash). Send it as a Bearer token.
@@ -96,6 +96,9 @@ Rate limits use Django's cache; with several server processes, configure a share
 A link shortener can be misused for phishing, so destinations are checked: only http/https, no private or local hostnames (including `localhost.*` and `*.localdomain`), no embedded passwords, and never LinkPulse itself.
 Operators can also block websites outright with `LINKPULSE_BLOCKED_DOMAINS=bad.example,other.example` (subdomains included).
 Not included yet: automatic checks against a reputation service such as Google Safe Browsing, and a public "report this link" page. See the limitations below.
+
+## Data retention
+Click rows are kept for `CLICK_RETENTION_DAYS` (default 365; `0` keeps everything). Remove older rows with `python manage.py prune_clicks` (add `--dry-run` to preview), ideally on a weekly schedule.
 
 ## Known limitations and next steps
 - Hostnames are checked by name only. A public domain whose DNS points at a private address is not detected, but LinkPulse never fetches destinations itself, so the server is not exposed to it.

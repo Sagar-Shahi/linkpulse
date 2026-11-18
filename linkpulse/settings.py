@@ -177,6 +177,8 @@ API_RATE_USER = os.environ.get('API_RATE_USER', '120/min')
 API_RATE_ANON = os.environ.get('API_RATE_ANON', '20/min')
 API_KEY_FAILURES_PER_5_MIN = env_int('API_KEY_FAILURES_PER_5_MIN', 20)
 MAX_LINKS_PER_USER = env_int('MAX_LINKS_PER_USER', 500)
+# Click rows older than this are removed by `manage.py prune_clicks`. 0 keeps everything.
+CLICK_RETENTION_DAYS = env_int('CLICK_RETENTION_DAYS', 365)
 MAX_API_KEYS_PER_USER = env_int('MAX_API_KEYS_PER_USER', 5)
 
 # --- REST API --------------------------------------------------------------------------------

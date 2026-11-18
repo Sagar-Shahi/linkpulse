@@ -169,3 +169,13 @@ class RecordClickTests(TestCase):
             with self.assertLogs('links.tracking', level='ERROR'):
                 record_click(request, self.link)
         self.assertEqual(Click.objects.count(), 0)
+
+
+class CodeClashTests(TestCase):
+    def test_a_code_clash_at_save_time_retries_with_a_new_code(self):
+        owner = make_user()
+        taken = make_link(owner, code='takenab2')
+        with mock.patch('links.models.generate_code', side_effect=['takenab2', 'freshcode']):
+            link = make_link(owner, title='Second')
+        self.assertEqual(link.code, 'freshcode')
+        self.assertNotEqual(link.pk, taken.pk)

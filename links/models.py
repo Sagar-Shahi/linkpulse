@@ -2,7 +2,7 @@ import secrets
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from django.conf import settings
-from django.db import models
+from django.db import IntegrityError, models, transaction
 from django.utils import timezone
 
 from .validators import validate_code, validate_destination_url, validate_utm
@@ -44,15 +44,21 @@ class Link(models.Model):
     def save(self, *args, **kwargs):
         if self.code:
             self.code = self.code.lower()
-        else:
-            for _ in range(10):
-                candidate = generate_code()
-                if not Link.objects.filter(code=candidate).exists():
-                    self.code = candidate
-                    break
-            else:  # pragma: no cover - practically impossible
-                raise RuntimeError('Could not generate a unique short code.')
-        super().save(*args, **kwargs)
+            super().save(*args, **kwargs)
+            return
+        # Codes are random. Two requests could pick the same one at the same moment, so the database's
+        # unique rule has the final word and a clash simply tries a new code.
+        for _ in range(10):
+            self.code = generate_code()
+            try:
+                with transaction.atomic():
+                    super().save(*args, **kwargs)
+                return
+            except IntegrityError:
+                if self.pk is not None and Link.objects.filter(pk=self.pk).exists():
+                    raise  # not a code clash
+        self.code = ''
+        raise RuntimeError('Could not generate a unique short code.')  # pragma: no cover
 
     @property
     def is_expired(self):
